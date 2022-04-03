@@ -8,7 +8,21 @@ Documentation Symfony :
 [https://symfony.com/doc/current/index.html](https://symfony.com/doc/current/index.html)
 
 Cours :
-https://github.com/leahpar/cesi-symfony
+https://github.com/leahpar/cesi-symfony-start
+
+## Prérequis
+
+- [ ] PHP / MySQL
+- [ ] Programmation Objet (POO)
+  - [ ] Classe, Objet
+  - [ ] Héritage, Interface
+- [ ] PHP POO
+  - [ ] Namespace : `namespace`, `use`...
+  - [ ] Autoload : `spl_autoload_register()`
+- [ ] Composer
+  - [ ] Gestion autoload : `composer dump-autoload`...
+  - [ ] Gestion dépendances : `composer require`, `composer install`...
+
 
 ## Composants
 
@@ -58,16 +72,6 @@ Doctrine = Entity Manager = Manipulation des données / abstraction de la base d
 
 Twig = Moteur de template
 
-**La "magie" d'un framework**
-
-Annotations
-
-Dependancy Injection
-
-Param Converter
-
-EventHandler (Middleware)
-
 **Workflow (simplifié)**
 
 ```mermaid
@@ -85,13 +89,23 @@ flowchart LR
 	I[...]
 	end
 ```
-![enter image description here](https://github.com/leahpar/imgs/raw/master/workflow.jpg)
+
+**La "magie" d'un framework**
+
+Annotations
+
+Dependancy Injection
+
+Param Converter
+
+EventHandler (Middleware)
+
 
 ## Installation
 
 ### Prérequis
 
-- [x] PHP 7/8
+- [x] PHP 7 / 8
 - [x] Base de données : MySQL / MariaDB / PostgreSQL / SQLite
 - [ ] Serveur web : Apache / Nginx
 - [ ] PhpMyAdmin ou autre
@@ -118,8 +132,8 @@ symfony new my_project_name --full
 ```
 
 - `--version=xx` installe une version spécifique
-    - Symfony 6.0 (php8)
-    - Symfony 5.4 (php7)
+  - Symfony 6.0 (php8)
+  - Symfony 5.4 (php7)
 - `--full` installe directement plein de packages utiles
 - `--no-git` Sans initialiser un repo git
 
@@ -278,6 +292,7 @@ Les annotations permettent de "configurer" les composants dans les commentaires 
 
 ```php
 // PHP 7/8
+
 /**
  * @Route("/admin")
  * @IsGranted("ROLE_ADMIN")
@@ -287,6 +302,7 @@ public function adminPage() {...}
 
 ```php
 // PHP 8 => attributs
+
 #[Route('/admin')]
 #[IsGranted('ROLE_ADMIN')]
 public function adminPage() {...}
@@ -512,42 +528,7 @@ public function new(Post $post, Request $request, EntityManagerInterface $em)
     ]);
 }
 ```
->🔥Duplication de code !
 
-**2 EN 1 !**
-```php
-#[Route('/posts/new', name: 'post_new', methods: ['GET', 'POST'])]
-#[Route('/posts/{id}/edit', name: 'post_edit', methods: ['GET', 'POST'])]
-public function new(?Post $post, Request $request, EntityManagerInterface $em)
-{
-	$post = $post ?? new Post();
-
-    // Création formulaire
-    $form = $this->createForm(PostType::class, $post);
-
-    // "Remplissage" du formulaire depuis la requête
-    $form->handleRequest($request);
-
-	// Si formulaire soumis et valide
-    if ($form->isSubmitted() && $form->isValid()) {
-		
-		// ici, $post contient les données soumises
-
-        // On enregistre
-        $em->persist($post);
-        $em->flush();
-
-        // On redirige vers l'affichage du post par exemple
-        return $this->redirectToRoute('post_show', ['id' => $post->getId()]);
-    }
-
-    // Si formulaire non soumis OU formulaire invalide
-    return $this->render('post/new.html.twig', [
-        'post' => $post,
-        'form' => $form->createView(),
-    ]);
-}
-```
 
 ### Exercice
 
@@ -729,11 +710,13 @@ Notre template se simplifie donc :
 
 ## Doctrine
 
+==Prérequis : § Injection de dépendances==
+
 ORM = **O**bject **R**elational **M**apping
 
 Permet l'abstraction de la base de donnée.
 
-On manipule des classes/objets (entités), pas des tables/lignes.
+On manipule des classes/objets (entités), **pas des tables/lignes**.
 
 **Références annotations doctrine :**
 https://www.doctrine-project.org/projects/doctrine-orm/en/2.9/reference/annotations-reference.html
@@ -796,8 +779,6 @@ php bin/console doctrine:schema:update --force
 Référence annotations :
 https://doctrine2.readthedocs.io/en/latest/reference/annotations-reference.html
 
-==Prérequis : § Injection de dépendances==
-
 ```php
 public function listPosts(EntityManagerInterface $em)
 {
@@ -835,11 +816,11 @@ public function createPost(EntityManagerInterface $em)
 - Exécuter la migration de bdd
 - Insérer quelques lignes à la main en bdd
 - Créer un nouveau contrôleur
-    - Lister les entités : `/posts`
-    - Afficher une entité : `/posts/{id}`
-    - Créer une entité : `/posts/new` (`POST`)
-    - Supprimer une entité : `POST: /posts/{id}/delete`
-    - ~~Modifier une entité~~
+  - Lister les entités : `/posts`
+  - Afficher une entité : `/posts/{id}`
+  - Créer une entité : `/posts/new` (`POST`)
+  - Supprimer une entité : `POST: /posts/{id}/delete`
+  - ~~Modifier une entité~~
 
 >💡Astuce : `php bin/console make:entity`
 

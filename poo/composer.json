@@ -1,0 +1,14 @@
+{
+    "name": "root/poo",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "require": {
+        "symfony/var-dumper": "^6.0",
+        "monolog/monolog": "^2.4",
+        "symfony/http-client": "^6.0"
+    }
+}
