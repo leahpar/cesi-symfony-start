@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <h1>{{ post.title }}</h1>
+
+    <p>{{ post.date | date('d/m/Y H:i') }}</p>
+
+    <p>{{ post.content }}</p>
+
+    <p><a href="{{ path('post_delete', {id: post.id}) }}">Supprimer</a></p>
+
+    <p><a href="{{ path('post_list') }}">Retour</a></p>
+
+{% endblock %}
+
