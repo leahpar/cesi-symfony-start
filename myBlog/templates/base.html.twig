@@ -5,15 +5,15 @@
 </head>
 <body>
 
-{% include "header.html.twig" %}
+{% include "layouts/header.html.twig" %}
 
-{% include "menu.html.twig" %}
+{% include "layouts/menu.html.twig" %}
 
 <div class="block">
     {% block content %}{% endblock %}
 </div>
 
-{% include "footer.html.twig" %}
+{% include "layouts/footer.html.twig" %}
 
 </body>
 </html>

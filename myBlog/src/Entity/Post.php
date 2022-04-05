@@ -22,9 +22,28 @@ class Post
     #[ORM\Column(type: 'datetime')]
     public \DateTime $date;
 
+    #[ORM\Column(type: 'boolean')]
+    public bool $published = true;
+
+    #[ORM\ManyToOne(targetEntity: Tag::class, inversedBy: 'posts')]
+    private $tag;
+
     public function __construct()
     {
         $this->date = new \DateTime();
     }
+
+    public function getTag(): ?Tag
+    {
+        return $this->tag;
+    }
+
+    public function setTag(?Tag $tag): self
+    {
+        $this->tag = $tag;
+
+        return $this;
+    }
+
 
 }

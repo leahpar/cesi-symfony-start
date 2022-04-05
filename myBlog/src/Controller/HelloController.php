@@ -16,7 +16,7 @@ class HelloController extends AbstractController
     public function helloWorld()
     {
 
-        return $this->render("helloworld.html.twig");
+        return $this->render("hello/helloworld.html.twig");
     }
 
     /**
@@ -47,7 +47,7 @@ class HelloController extends AbstractController
                              string $nom,
                              HelloService $helloService,
     ) {
-        return $this->render("helloNom.html.twig", [
+        return $this->render("hello/helloNom.html.twig", [
             'nom' => $helloService->majsucule($nom),
         ]);
     }

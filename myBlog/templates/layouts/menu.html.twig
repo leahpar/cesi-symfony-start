@@ -1,0 +1,12 @@
+<div class="block">
+    <nav>
+        <a href="{{ path('posts_list') }}">Les posts</a>
+        <a href="{{ path('post_new') }}">Ajouter</a>
+
+
+        <form method="get" action="{{ path('posts_search') }}">
+        <input type="search" name="search" placeholder="Rechercher un post">
+        </form>
+
+    </nav>
+</div>

@@ -8,9 +8,11 @@
 
     <p>{{ post.content }}</p>
 
+    <p><a href="{{ path('post_edit', {id: post.id}) }}">Modifier</a></p>
+
     <p><a href="{{ path('post_delete', {id: post.id}) }}">Supprimer</a></p>
 
-    <p><a href="{{ path('post_list') }}">Retour</a></p>
+    <p><a href="{{ path('posts_list') }}">Retour</a></p>
 
 {% endblock %}
 

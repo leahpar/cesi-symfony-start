@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    {{ form_start(form) }}
+
+    <div class="toto">
+        {{ form_errors(form) }}
+    </div>
+
+    <div class="toto">
+        {{ form_row(form.title) }}
+    </div>
+
+    <div class="toto">
+        {{ form_row(form.content) }}
+    </div>
+
+    <div class="toto">
+        {{ form_row(form.date) }}
+    </div>
+
+    <div class="toto">
+        {{ form_row(form.tag) }}
+    </div>
+
+    {{ form_end(form) }}
+
+    <a href="{{ path('posts_list') }}">annuler</a>
+
+{% endblock %}
+

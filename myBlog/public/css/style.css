@@ -7,3 +7,24 @@ body {
     padding: 5px;
     margin: 5px;
 }
+
+
+#listposts {
+    width: 100%;
+
+}
+#listposts th {
+    text-align: left;
+    background-color: #DDDDDD;
+}
+#listposts tr:nth-child(even) {
+    background: beige;
+}
+#listposts tr:nth-child(odd) {
+    background: azure;
+}
+
+
+nav a {
+    margin-right: 10px;
+}
