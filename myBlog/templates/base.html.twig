@@ -9,6 +9,14 @@
 
 {% include "layouts/menu.html.twig" %}
 
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="flash-{{ label }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
 <div class="block">
     {% block content %}{% endblock %}
 </div>

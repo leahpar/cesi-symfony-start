@@ -28,3 +28,14 @@ body {
 nav a {
     margin-right: 10px;
 }
+
+
+.flash-success {
+    color: green;
+}
+.flash-error {
+    color: red;
+}
+.flash-warning {
+    color: orange;
+}

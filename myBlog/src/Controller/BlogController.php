@@ -7,10 +7,20 @@ use App\Form\PostType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class BlogController extends AbstractController
 {
+
+    /**
+     * Liste des posts
+     */
+    #[Route('/admin', name: 'admin')]
+    public function admin()
+    {
+        return new Response();
+    }
 
     /**
      * Liste des posts
@@ -76,6 +86,8 @@ class BlogController extends AbstractController
             $em->persist($post);
             $em->flush();
 
+            $this->addFlash('success', 'Post enregistré');
+
             // On redirige vers l'affichage du post par exemple
             return $this->redirectToRoute('post_show', ['id' => $post->id]);
         }
@@ -108,6 +120,8 @@ class BlogController extends AbstractController
             $em->persist($post);
             $em->flush();
 
+            $this->addFlash('success', 'Post modifié');
+
             // On redirige vers l'affichage du post par exemple
             return $this->redirectToRoute('post_show', ['id' => $post->id]);
         }
@@ -126,6 +140,8 @@ class BlogController extends AbstractController
     {
         $em->remove($post);
         $em->flush();
+
+        $this->addFlash('success', 'Post supprimé');
 
         return $this->redirectToRoute('posts_list');
     }
