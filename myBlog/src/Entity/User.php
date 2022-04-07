@@ -3,72 +3,94 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    public $id;
+    private $id;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    public $nom;
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    private $email;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    public $prenom;
+    #[ORM\Column(type: 'json')]
+    private $roles = [];
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Panier::class, orphanRemoval: true)]
-    private $paniers;
+    #[ORM\Column(type: 'string')]
+    private $password;
 
-    public function __construct()
+    public function getId(): ?int
     {
-        $this->paniers = new ArrayCollection();
+        return $this->id;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
     }
 
     /**
-     * @return Collection<int, Panier>
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
      */
-    public function getPaniers(): Collection
+    public function getUserIdentifier(): string
     {
-        return $this->paniers;
+        return (string) $this->email;
     }
 
-    public function addPanier(Panier $panier): self
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
     {
-        if (!$this->paniers->contains($panier)) {
-            $this->paniers[] = $panier;
-            $panier->setUser($this);
-        }
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
 
         return $this;
     }
 
-    public function removePanier(Panier $panier): self
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
     {
-        if ($this->paniers->removeElement($panier)) {
-            // set the owning side to null (unless already changed)
-            if ($panier->getUser() === $this) {
-                $panier->setUser(null);
-            }
-        }
+        return $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
 
         return $this;
     }
 
-    public function getPanier()
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
     {
-        foreach ($this->getPaniers() as $commande) {
-            if ($commande->state == "panier") {
-                return $commande;
-            }
-        }
-        $panier = new Panier();
-        $panier->user = $this;
-        return $panier;
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
-
 }

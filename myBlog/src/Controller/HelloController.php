@@ -24,7 +24,29 @@ class HelloController extends AbstractController
      */
     public function helloPrenom(Request $request)
     {
+        // /hello?prenom=jean
         $prenom = $request->query->get('prenom');
+
+        $response = new Response();
+        $response->setContent("<h1>Hello ".$prenom." !</h1>");
+        return $response;
+    }
+
+
+    /**
+     * @Route("/hellouser", name="hello_user")
+     */
+    public function helloUser()
+    {
+        $user = $this->getUser();
+
+        if ($user) {
+            $prenom = $user->getEmail();
+        }
+        else {
+            $prenom = "inconnu";
+        }
+
         $response = new Response();
         $response->setContent("<h1>Hello ".$prenom." !</h1>");
         return $response;

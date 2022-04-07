@@ -3,23 +3,30 @@
 namespace App\Controller;
 
 use App\Entity\Post;
+use App\Entity\User;
 use App\Form\PostType;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class BlogController extends AbstractController
 {
 
-    /**
-     * Liste des posts
-     */
-    #[Route('/admin', name: 'admin')]
-    public function admin()
+    #[Route('/', name: 'index')]
+    public function index()
     {
-        return new Response();
+        return $this->redirectToRoute('posts_list');
     }
 
     /**
@@ -30,8 +37,9 @@ class BlogController extends AbstractController
     {
         $date = new \DateTime("2022-04-01");
         $posts = $em->getRepository(Post::class)->findPostsAfterDate($date);
+
         return $this->render("posts/posts.html.twig", [
-            'posts' => $posts
+            'posts' => $posts,
         ]);
     }
 
@@ -66,6 +74,7 @@ class BlogController extends AbstractController
      * Création d'un post
      */
     #[Route('/posts/new', name: 'post_new')]
+    #[Security("is_granted('ROLE_ADMIN')")]
     public function new(Request $request, EntityManagerInterface $em)
     {
         // Nouveau Post "vierge"
@@ -81,6 +90,35 @@ class BlogController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             // ici, $post contient les données soumises
+            // $post->date = new \DateTime();
+            // ...
+
+            // On récupère l'image uploadée
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('imageFile')->getData();
+
+            // Si image uploadée
+            if ($imageFile) {
+
+                // On lui génère un nom unique
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $originalExtension = pathinfo($imageFile->getClientOriginalName(), PATHINFO_EXTENSION);
+                $newFilename = $originalExtension . "-" . uniqid() . "." . $originalExtension;
+
+                try {
+                    // on "enregistre" le fichier
+                    $imageFile->move(
+                        $this->getParameter('images_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ...
+                    $this->addFlash('error', 'Image pas enregistrée');
+                }
+
+                // Et on garde le nom de l'image
+                $post->imageName = $newFilename;
+            }
 
             // On enregistre
             $em->persist($post);
@@ -136,14 +174,62 @@ class BlogController extends AbstractController
      * Suppression d'un post
      */
     #[Route('/posts/{id}/delete', name: 'post_delete')]
-    public function deletePost(EntityManagerInterface $em, Post $post)
+    public function deletePost(EntityManagerInterface $em, Post $post, MailerInterface $mailer)
     {
+        $id = $post->id;
         $em->remove($post);
         $em->flush();
 
         $this->addFlash('success', 'Post supprimé');
 
+        $email = (new Email())
+            ->from('hello@example.com')
+            ->to('you@example.com')
+            ->subject('Un post a été supprimé')
+            ->text('Le post '.$id.' a été supprimé');
+        $mailer->send($email);
+
         return $this->redirectToRoute('posts_list');
     }
+
+    #[Route('/iss', name:'iss')]
+    public function iss(HttpClientInterface $client, CacheInterface $myCachePool)
+    {
+        $position = $myCachePool->get('iss_position', function (ItemInterface $item) use ($client) {
+            $item->expiresAfter(60);
+            $response = $client->request(
+                'GET',
+                'http://api.open-notify.org/iss-now.json'
+            );
+
+            //$content = $response->getContent();
+            //$data = json_decode($content, true);
+
+            $data = $response->toArray();
+
+            // {"timestamp": 1649323511, "message": "success", "iss_position": {"longitude": "17.3419", "latitude": "29.8667"}}
+            return $data['iss_position'];
+        });
+
+
+        return $this->render("iss.html.twig", [
+            'position' => $position,
+        ]);
+    }
+
+    #[Route('/random', name:'random')]
+    public function test(CacheInterface $myCachePool)
+    {
+        $value = $myCachePool->get('my_cache_key', function (ItemInterface $item) {
+            $item->expiresAfter(30);
+            $result = rand(1, 1000); // Traitement très long et compliqué
+            return $result;
+        });
+
+        return $this->render("random.html.twig", [
+            'nombre' => $value,
+        ]);
+    }
+
 
 }

@@ -1,1 +1,8 @@
-<div class="block">MON SUPER SITE</div>
+<div class="block">
+    MON SUPER SITE
+
+    {% if app.user %}
+        {{ app.user.email }}
+    {% endif %}
+
+</div>

@@ -21,9 +21,9 @@ class Panier
     #[ORM\Column(type: 'string', length: 255)]
     public $state = "panier";
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'paniers')]
-    #[ORM\JoinColumn(nullable: false)]
-    public $user;
+//    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'paniers')]
+//    #[ORM\JoinColumn(nullable: false)]
+//    public $user;
 
     #[ORM\OneToMany(targetEntity: PanierProduit::class, mappedBy: 'panier')]
     public $panierProduits = [];
