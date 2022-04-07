@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+
+    <ul>
+        {% for p in produits %}
+            <li>
+                {{ p.nom }} ({{ p.prix }})
+                <a href="{{ path('ajouter_jardin', {id: p.id}) }}">Ajouter au panier</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h1>{{ user.prenom }}</h1>
+
+    {% for commande in user.paniers %}
+
+        <h2>
+            Commande
+            #{{ commande.id }}
+            ({{ commande.state }})
+        </h2>
+
+        <ul>
+            {% for pp in commande.panierProduits %}
+                <li>
+                    nom: {{ pp.produit.nom }}
+                    qte: {{ pp.quantite | add42 }}
+                    pu: {{ pp.produit.prix }} €/u
+                    total: {{ pp.quantite * pp.produit.prix }} €
+                </li>
+            {% endfor %}
+        </ul>
+
+    {% endfor %}
+
+{% endblock %}
