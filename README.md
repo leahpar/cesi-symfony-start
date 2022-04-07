@@ -128,13 +128,13 @@ Bundles :
 
 **Création structure du projet**
 ```
-symfony new my_project_name --full
+symfony new my_project_name --webapp
 ```
 
 - `--version=xx` installe une version spécifique
   - Symfony 6.0 (php8)
   - Symfony 5.4 (php7)
-- `--full` installe directement plein de packages utiles
+- `--webapp` installe directement plein de packages utiles pour le web
 - `--no-git` Sans initialiser un repo git
 
 ```
@@ -907,3 +907,199 @@ public function showPost(Post $post)
 
 
 ==GOTO: §Form==
+
+
+## Divers
+
+### Session
+
+```php
+public function index(SessionInterface $session)
+{
+    $session->set('foo', 'bar');
+    $foobar = $session->get('foobar', 'default');
+}
+```
+
+### Messages flash
+
+```php
+// Controller
+public function index()
+{
+	$this->addFlash('notice','Yolo!');
+	$this->addFlash('error','Pas bien !');
+}
+```
+```twig
+{# twig #}
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="flash-{{ label }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+```
+
+### Emails
+
+https://symfony.com/doc/current/mailer.html
+
+Configurer un serveur SMTP : `.env.local` => `MAILER_DSN=...`
+
+```php
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+
+public function sendEmail(MailerInterface $mailer) {
+    $email = (new Email())
+        ->from('hello@example.com')
+        ->to('you@example.com')
+        ->subject('Time for Symfony Mailer!')
+        ->text('Sending emails is fun again!')
+        ->html('<p>See Twig integration for better HTML integration!</p>');
+    $mailer->send($email);
+    // ...
+}
+```
+
+### HTTP Client
+
+https://symfony.com/doc/current/http_client.html
+
+```php
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+
+public function httpCall(HttpClientInterface $client)
+{
+	$response = $client->request(
+            'GET',
+            'https://api.github.com/repos/symfony/symfony-docs'
+        );
+
+        $statusCode = $response->getStatusCode();
+        // $statusCode = 200
+        $contentType = $response->getHeaders()['content-type'][0];
+        // $contentType = 'application/json'
+        $content = $response->getContent();
+        // $content = '{"id":521583, "name":"symfony-docs", ...}'
+        $content = $response->toArray();
+        // $content = ['id' => 521583, 'name' => 'symfony-docs', ...]
+        // ...
+}
+```
+
+### Cache
+
+https://symfony.com/doc/current/cache.html
+
+```yaml
+# config/packages/cache.yaml
+framework:
+    cache:
+        pools:
+            my_cache_pool: # autowireable via "CacheInterface $myCachePool"
+                adapter: cache.adapter.filesystem
+```
+
+```php
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+
+public function test(CacheInterface $myCachePool)
+{
+    $value = $myCachePool->get('my_cache_key', function (ItemInterface $item) {
+        $item->expiresAfter(3600);
+
+        $result = rand(1, 1000); // Traitement très long et compliqué
+
+        return $result;
+    });
+
+    dump($value);
+    //$myCachePool->delete('my_cache_key');
+
+	// ...
+}
+```
+
+### Authentification
+
+// ...
+
+### Upload de fichiers
+
+```php
+// Entité
+#[ORM\Column(type: 'string', length: 255, nullable: true)]
+public string $imageName;
+```
+
+```php
+// EntiteType
+->add('imageFile', FileType::class, [
+    'label' => 'Image',
+    'mapped' => false,
+    'required' => false,
+    //'constraints' => [
+    //    new File([
+    //        'maxSize' => '1024k',
+    //        'mimeTypes' => [
+    //            'image/*',
+    //        ],
+    //    ])
+    //],
+])
+```
+
+```php
+// Controller
+if ($form->isSubmitted() && $form->isValid()) {
+
+    // ...
+
+    // On récupère l'image uploadée
+    /** @var UploadedFile $imageFile */
+    $imageFile = $form->get('imageFile')->getData();
+
+    // Si image uploadée
+    if ($imageFile) {
+
+        // On lui génère un nom unique
+        $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+        $originalExtension = pathinfo($imageFile->getClientOriginalName(), PATHINFO_EXTENSION);
+        $newFilename = $originalExtension . "-" . uniqid() . "." . $originalExtension;
+
+        try {
+            // on "enregistre" le fichier
+            $imageFile->move(
+                $this->getParameter('images_directory'),
+                $newFilename
+            );
+        } catch (FileException $e) {
+            // ...
+            $this->addFlash('error', 'Image pas enregistrée');
+        }
+
+        // Et on garde le nom de l'image
+        $post->imageName = $newFilename;
+    }
+
+    // On enregistre
+    $em->persist($post);
+    $em->flush();
+    return $this->redirectToRoute(...);
+}
+```
+
+
+
+
+
+### TODO
+
+- [ ] Upload d'images
+- [ ] API (json & cie)
+- [ ] Recherche / filtres
+
