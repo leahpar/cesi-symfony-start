@@ -2,29 +2,40 @@
 
 {% block content %}
 
-    {{ form_start(form) }}
+    {# {{ form_start(form) }} #}
+    <form method="post">
 
-    <div class="toto">
-        {{ form_errors(form) }}
-    </div>
+        <div class="toto">
+            {{ form_errors(form) }}
+        </div>
 
-    <div class="toto">
-        {{ form_row(form.title) }}
-    </div>
+        <div class="toto">
+            <div><label for="post_title" class="required">Titre de l'article</label><input type="text" id="post_title" name="post[title]" required="required"></div>
+        </div>
 
-    <div class="toto">
-        {{ form_row(form.content) }}
-    </div>
+        <div class="toto">
+            {{ form_row(form.content) }}
+        </div>
 
-    <div class="toto">
-        {{ form_row(form.date) }}
-    </div>
+        <div class="toto">
+            {{ form_row(form.date) }}
+        </div>
 
-    <div class="toto">
-        {{ form_row(form.tag) }}
-    </div>
+        <div class="toto">
+            {{ form_row(form.tag) }}
+        </div>
 
-    {{ form_end(form) }}
+        {#
+        <div class="toto">
+            {{ form_row(form.imageFile) }}
+        </div>
+        #}
+
+        <button>OK</button>
+
+        <!-- CSRF -->
+        {{ form_widget(form._token) }}
+    </form>
 
     <a href="{{ path('posts_list') }}">annuler</a>
 
