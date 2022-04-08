@@ -38,14 +38,15 @@ class PostType extends AbstractType
                 'label' => 'Image',
                 'mapped' => false,
                 'required' => false,
-                //'constraints' => [
-                //    new File([
-                //        'maxSize' => '1024k',
-                //        'mimeTypes' => [
-                //            'image/*',
-                //        ],
-                //    ])
-                //],
+                'attr' => [
+                    'accept' => 'image/*',
+                ],
+                'constraints' => [
+                    new File([
+                        'maxSize' => '2M',
+                        'mimeTypes' => ['image/*'],
+                    ])
+                ],
             ])
         ;
     }

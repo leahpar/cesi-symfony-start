@@ -74,4 +74,15 @@ class HelloController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/hellototo", name="hello_toto")
+     */
+    public function helloToto() {
+        $toto = $this->getParameter('toto');
+
+        return $this->render("hello/helloNom.html.twig", [
+            'nom' => $toto,
+        ]);
+    }
+
 }

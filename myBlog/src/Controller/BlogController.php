@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Post;
-use App\Entity\User;
 use App\Form\PostType;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -11,11 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -89,10 +86,6 @@ class BlogController extends AbstractController
         // Si formulaire soumis et valide
         if ($form->isSubmitted() && $form->isValid()) {
 
-            // ici, $post contient les données soumises
-            // $post->date = new \DateTime();
-            // ...
-
             // On récupère l'image uploadée
             /** @var UploadedFile $imageFile */
             $imageFile = $form->get('imageFile')->getData();
@@ -103,7 +96,7 @@ class BlogController extends AbstractController
                 // On lui génère un nom unique
                 $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $originalExtension = pathinfo($imageFile->getClientOriginalName(), PATHINFO_EXTENSION);
-                $newFilename = $originalExtension . "-" . uniqid() . "." . $originalExtension;
+                $newFilename = $originalFilename . "-" . uniqid() . "." . $originalExtension;
 
                 try {
                     // on "enregistre" le fichier
@@ -119,6 +112,7 @@ class BlogController extends AbstractController
                 // Et on garde le nom de l'image
                 $post->imageName = $newFilename;
             }
+
 
             // On enregistre
             $em->persist($post);
@@ -152,7 +146,32 @@ class BlogController extends AbstractController
         // Si formulaire soumis et valide
         if ($form->isSubmitted() && $form->isValid()) {
 
-            // ici, $post contient les données soumises
+            // On récupère l'image uploadée
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('imageFile')->getData();
+
+            // Si image uploadée
+            if ($imageFile) {
+
+                // On lui génère un nom unique
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $originalExtension = pathinfo($imageFile->getClientOriginalName(), PATHINFO_EXTENSION);
+                $newFilename = $originalFilename . "-" . uniqid() . "." . $originalExtension;
+
+                try {
+                    // on "enregistre" le fichier
+                    $imageFile->move(
+                        $this->getParameter('images_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ...
+                    $this->addFlash('error', 'Image pas enregistrée');
+                }
+
+                // Et on garde le nom de l'image
+                $post->imageName = $newFilename;
+            }
 
             // On enregistre
             $em->persist($post);
@@ -230,6 +249,7 @@ class BlogController extends AbstractController
             'nombre' => $value,
         ]);
     }
+
 
 
 }

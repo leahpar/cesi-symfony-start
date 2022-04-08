@@ -2,8 +2,8 @@
 
 {% block content %}
 
-    {# {{ form_start(form) }} #}
-    <form method="post">
+    {{ form_start(form) }}
+    <!--<form method="post" enctype="multipart/form-data">-->
 
         <div class="toto">
             {{ form_errors(form) }}
@@ -25,11 +25,9 @@
             {{ form_row(form.tag) }}
         </div>
 
-        {#
         <div class="toto">
             {{ form_row(form.imageFile) }}
         </div>
-        #}
 
         <button>OK</button>
 
