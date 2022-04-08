@@ -1,5 +1,7 @@
 INFAL156-PHP - Démarrer avec un Framework : Symfony
 
+mailto: raphael@bacco.fr
+
 Avril 2022
 
 # Symfony
@@ -105,7 +107,7 @@ EventHandler (Middleware)
 
 ### Prérequis
 
-- [x] PHP 7 / 8
+- [x] PHP 8 !!!!!
 - [x] Base de données : MySQL / MariaDB / PostgreSQL / SQLite
 - [ ] Serveur web : Apache / Nginx
 - [ ] PhpMyAdmin ou autre
@@ -997,10 +999,10 @@ https://symfony.com/doc/current/cache.html
 ```yaml
 # config/packages/cache.yaml
 framework:
-    cache:
-        pools:
-            my_cache_pool: # autowireable via "CacheInterface $myCachePool"
-                adapter: cache.adapter.filesystem
+  cache:
+    pools:
+      my_cache_pool: # autowireable via "CacheInterface $myCachePool"
+        adapter: cache.adapter.filesystem
 ```
 
 ```php
@@ -1039,7 +1041,7 @@ GMAIL_PASSWORD=toto123
 ```yaml
 # config/services.yaml
 parameters:
-	gmail_password: '%env(GMAIL_PASSWORD)'
+  gmail_password: '%env(GMAIL_PASSWORD)'
     images_directory: '%kernel.project_dir%/public/uploads/'
 ```
 
