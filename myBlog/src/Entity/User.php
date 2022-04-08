@@ -26,6 +26,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string')]
     private $password;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $numeroSecu;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -94,5 +97,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+
+//    public function getNumeroSecu(): ?string
+//    {
+//        return decrypt($this->numeroSecu);
+//    }
+//
+//    public function setNumeroSecu(?string $numeroSecu): self
+//    {
+//        $this->numeroSecu = encrypt($numeroSecu);
+//
+//        return $this;
+//    }
+    /**
+     * @return mixed
+     */
+    public function getNumeroSecu()
+    {
+        return $this->numeroSecu;
+    }
+
+    /**
+     * @param mixed $numeroSecu
+     */
+    public function setNumeroSecu($numeroSecu): void
+    {
+        $this->numeroSecu = $numeroSecu;
     }
 }

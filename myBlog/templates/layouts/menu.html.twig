@@ -1,7 +1,17 @@
 <div class="block">
     <nav>
         <a href="{{ path('posts_list') }}">Les posts</a>
-        <a href="{{ path('post_new') }}">Ajouter</a>
+
+        {% if is_granted('ROLE_MODERATEUR') %}
+            <a href="{{ path('post_new') }}">Ajouter</a>
+        {% endif %}
+
+        {% if app.user %}
+            <a href="{{ path('logout') }}">se déconnecter</a>
+        {% else %}
+            <a href="{{ path('login') }}">se connecter</a>
+            <a href="{{ path('app_register') }}">se créer un compte</a>
+        {% endif %}
 
 
         <form method="get" action="{{ path('posts_search') }}">

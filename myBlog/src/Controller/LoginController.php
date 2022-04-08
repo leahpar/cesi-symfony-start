@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -28,5 +30,15 @@ class LoginController extends AbstractController
     #[Route('/logout', name:'logout')]
     public function logout() {
 
+    }
+
+    #[Route('/toto', name:'toto')]
+    public function toto(EntityManagerInterface $em) {
+        /** @var User $user */
+        $user = $this->getUser();
+        //$user->setNumeroSecu("1234567890");
+        //$em->flush();
+        dump($user);
+        return new Response($user->getNumeroSecu());
     }
 }

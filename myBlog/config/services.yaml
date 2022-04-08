@@ -6,12 +6,22 @@
 parameters:
     images_directory: '%kernel.project_dir%/public/uploads/'
     toto: '%env(TOTO)%'
+    CIPHERING: '%env(CIPHERING)%'
+    INIT_VECTOR: '%env(INIT_VECTOR)%'
+    ENCRYPTION_KEY: '%env(ENCRYPTION_KEY)%'
+    CRYPT_OPTIONS: '%env(CRYPT_OPTIONS)%'
 
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+        bind:
+            $CIPHERING: '%CIPHERING%'
+            $INIT_VECTOR: '%INIT_VECTOR%'
+            $ENCRYPTION_KEY: '%ENCRYPTION_KEY%'
+            $CRYPT_OPTIONS: '%CRYPT_OPTIONS%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
