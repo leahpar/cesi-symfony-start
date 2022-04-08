@@ -20,7 +20,7 @@ class Post
     public string $content;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    public string $imageName;
+    public ?string $imageName = null;
 
     #[ORM\Column(type: 'datetime')]
     public \DateTime $date;

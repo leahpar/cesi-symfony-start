@@ -1023,41 +1023,75 @@ public function test(CacheInterface $myCachePool)
 	// ...
 }
 ```
-
 ### Authentification
 
-// ...
+https://symfony.com/doc/current/security.html
 
-### Upload de fichiers
+### Paramétrage
 
-```php
-// Entité
-#[ORM\Column(type: 'string', length: 255, nullable: true)]
-public string $imageName;
+https://symfony.com/doc/current/configuration.html
+
+```bash
+# .env / .env.local
+GMAIL_PASSWORD=toto123
 ```
 
-```php
-// EntiteType
-->add('imageFile', FileType::class, [
-    'label' => 'Image',
-    'mapped' => false,
-    'required' => false,
-    //'constraints' => [
-    //    new File([
-    //        'maxSize' => '1024k',
-    //        'mimeTypes' => [
-    //            'image/*',
-    //        ],
-    //    ])
-    //],
-])
+```yaml
+# config/services.yaml
+parameters:
+	gmail_password: '%env(GMAIL_PASSWORD)'
+    images_directory: '%kernel.project_dir%/public/uploads/'
 ```
 
 ```php
 // Controller
-if ($form->isSubmitted() && $form->isValid()) {
+public function randomPage()
+{
+	$gmailPasswd = $this->getParameter('gmail_password');
+	$imageDir = $this->getParameter('images_directory');
+	// ...
+}
+```
 
-    // ...
+
+### Upload de fichiers
+
+https://symfony.com/doc/current/controller/upload_file.html
+
+```php
+// Entity/Post.php
+class Post {
+	// ...
+	
+	#[ORM\Column(type: 'string', length: 255, nullable: true)]
+	public string $imageName;
+
+	// ...
+}
+```
+
+```php
+// Form/PostType.php
+
+// ...
+->add('imageFile', FileType::class, [
+    'label' => 'Image',
+    'mapped' => false,
+    'required' => false,
+    'constraints' => [
+        new File([
+            'maxSize' => '2M',
+            'mimeTypes' => ['image/*'],
+        ])
+    ],
+])
+```
+
+```php
+// Controller/BlogController.php
+
+// ...
+if ($form->isSubmitted() && $form->isValid()) {
 
     // On récupère l'image uploadée
     /** @var UploadedFile $imageFile */
@@ -1086,20 +1120,81 @@ if ($form->isSubmitted() && $form->isValid()) {
         $post->imageName = $newFilename;
     }
 
-    // On enregistre
-    $em->persist($post);
-    $em->flush();
-    return $this->redirectToRoute(...);
+    // $em->persist($post);
+    // $em->flush();
+    // return $this->redirectToRoute(...);
 }
 ```
 
+```twig
+{# formulaire.html.twig #}
+...
+{{ form_row(form.imageFile) }}
+...
+```
 
+```twig
+{# post.html.twig #}
+...
+<img src="/uploads/{{ post.imageName }}">
+...
+```
 
+### API
+
+```php
+#[Route('/api/random', name: 'api_random')]
+public function getRandomNumber()
+{
+    $data = [
+        "randomNumber" => rand(1, 1000),
+    ];
+    return new JsonResponse($data);
+ }
+```
+
+Sérialisation basique :
+
+```php
+#[Route('/api/posts/{id}', name: 'api_post')]
+public function getPost(Post $post)
+{
+    return new JsonResponse($post);
+}
+```
+```json
+// /api/posts/19
+{
+  "id": 19,
+  "title": "Mon post N°19",
+  "content": "Lorem ipsum etc...",
+  "date": "2022-04-05T11:34:21+02:00",
+  "published": true
+}
+```
+
+Sérialization avancée :
+```php
+// Entity/User.php
+use use Symfony\Component\Serializer\Annotation\Ignore;
+class User {
+	// ...
+	#[ignore]
+	public string $password;
+	// ...
+}
+```
+```php
+#[Route('/api/users/{id}', name: 'api_user')]
+public function getPost(User $user, SerializerInterface $serializer)
+{
+    $json = $serializer->serialize($user, 'json');
+    return new JsonResponse($json, json: true);
+ }
+```
 
 
 ### TODO
 
-- [ ] Upload d'images
-- [ ] API (json & cie)
 - [ ] Recherche / filtres
 
